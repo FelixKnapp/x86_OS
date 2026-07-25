@@ -1,6 +1,6 @@
 [org 0x7c00]
 KERNEL equ 0x1000
-SECTORS equ 0x1
+SECTORS equ 0x4
 CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
 
@@ -108,18 +108,20 @@ disk_error:
 start_pm:
   ; setup segments
   mov ax, DATA_SEG
-    mov ds, ax
-	  mov ss, ax
-	  mov es, ax
-	  mov fs, ax
-	  mov gs, ax
+  mov ds, ax
+	mov ss, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
 	
-    ; 32 bit stack base pointer
-	  mov ebp, 0x90000
-    mov esp, ebp
+  ; 32 bit stack base pointer
+	mov ebp, 0x90000
+  mov esp, ebp
 
   ; jump to kernel
   jmp KERNEL
+
+  jmp $
 
 times 510-($-$$) db 0
 dw 0xaa55

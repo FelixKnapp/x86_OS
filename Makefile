@@ -1,7 +1,7 @@
 .PHONY: build run all dirs boot link
 
 SRC_KERNEL_MODULES := $(wildcard src/kernel.*.c)
-O_KERNEL_MODULES := $(patsubst src/%.c,temp/%.o,$(SRC_KERNEL_MODULES))
+O_KERNEL_MODULES := $(patsubst src/kernel.%.c,temp/kernel.%.o,$(SRC_KERNEL_MODULES))
 
 build: dirs boot $(O_KERNEL_MODULES) link
 
@@ -12,7 +12,7 @@ boot:
 	@nasm "src/boot.asm" -f bin -o "temp/boot.bin"
 	@nasm "src/kernel_entry.asm" -f elf -o "temp/kernel_entry.o"
 
-temp/%.o: src/%.c
+temp/kernel.%.o: src/kernel.%.c
 	@i386-elf-gcc -ffreestanding -m32 -g -c $< -o $@
 
 link:
