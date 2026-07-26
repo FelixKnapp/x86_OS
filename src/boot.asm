@@ -1,6 +1,6 @@
 [org 0x7c00]
 KERNEL equ 0x1000
-SECTORS equ 0x4
+SECTORS equ 0xc ; NOTE: always keep this as high as possible (no disk error on boot)
 CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
 

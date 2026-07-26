@@ -2,9 +2,9 @@
 #include <stdint.h>
 
 #define SECTOR_SIZE  0x2
-#define SECTOR_COUNT 0x200 // multiples of 8
-#define SECTOR_BASE  0xb9000
-#define BITMAP_BASE  0xba000
+#define SECTOR_COUNT 0x8000 // multiples of 8
+#define SECTOR_BASE  0x100000
+#define BITMAP_BASE  0x110000
 
 volatile uint8_t* const bitmap = (volatile uint8_t* const)BITMAP_BASE;
 volatile uint8_t* const memory = (volatile uint8_t* const)SECTOR_BASE;
