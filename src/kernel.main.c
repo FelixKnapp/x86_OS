@@ -102,7 +102,7 @@ void handleKeyboardInterrupt(){
     setTerminalColor(WHITE, BLACK);
     if(!(scancode & 0x80)) {
       if(scancode < 128 && scancode != 0)
-        printChar(kbd_US[scancode]);
+        printChar(kbd_US[scancode]); // NOTE: Temporary, add real driver here (should tell os what key was pressed and what is currently pressed), also no current implementation for special keys like alt, host, arrow keys, etc.
     }
   }
 
