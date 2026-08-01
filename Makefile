@@ -1,4 +1,8 @@
+include build_scripts/config.mk
+
 .PHONY: build run all dirs boot link
+
+include build_scripts/toolchain.mk
 
 SRC_KERNEL_MODULES := $(wildcard src/kernel.*.c)
 O_KERNEL_MODULES := $(patsubst src/kernel.%.c,temp/kernel.%.o,$(SRC_KERNEL_MODULES))

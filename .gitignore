@@ -58,3 +58,8 @@ dkms.conf
 temp/
 build/
 
+# GCC Toolchain
+toolchain/
+
+# Visual Studio Configuration
+.vscode/
