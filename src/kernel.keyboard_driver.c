@@ -4,8 +4,8 @@
 #include "kernel.video.h" // NOTE: TEMPORARY
 
 extern void keyboardHandler();
-extern int8_t ioIn(unsigned short port);
-extern void ioOut(unsigned short port, unsigned char data);
+extern int8_t ioIn(uint16_t port);
+extern void ioOut(uint16_t port, uint8_t data);
 
 #define PIC1_COMMAND_PORT 0x20
 #define PIC1_DATA_PORT 0x21
@@ -15,13 +15,16 @@ extern void ioOut(unsigned short port, unsigned char data);
 #define KEYBOARD_DATA_PORT 0x60
 #define KEYBOARD_STATUS_PORT 0x64
 
+char key_pressed = 0;
+uint8_t key_flags = 0;
+
 void initKeyboard() {
   // unmask keyboard Interrypt
   ioOut(PIC1_DATA_PORT, 0b11111101);
 }
 
 void handleKeyboardInterrupt(){
-  unsigned char status = ioIn(KEYBOARD_STATUS_PORT);
+  uint8_t status = ioIn(KEYBOARD_STATUS_PORT);
 
   if(status & 0x1) {
     char scancode = ioIn(KEYBOARD_DATA_PORT);
