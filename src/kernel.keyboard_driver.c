@@ -2,10 +2,11 @@
 #include "keymap.h"
 #include "kernel.interrupts.h"
 #include "kernel.video.h" // NOTE: TEMPORARY
+#include <stdint.h>
 
 extern void keyboardHandler();
-extern int8_t ioIn(unsigned short port);
-extern void ioOut(unsigned short port, unsigned char data);
+extern int8_t ioIn(uint16_t port);
+extern void ioOut(uint16_t port, uint8_t data);
 
 #define PIC1_COMMAND_PORT 0x20
 #define PIC1_DATA_PORT 0x21
@@ -21,10 +22,10 @@ void initKeyboard() {
 }
 
 void handleKeyboardInterrupt(){
-  unsigned char status = ioIn(KEYBOARD_STATUS_PORT);
+  uint8_t status = ioIn(KEYBOARD_STATUS_PORT);
 
   if(status & 0x1) {
-    char scancode = ioIn(KEYBOARD_DATA_PORT);
+    int8_t scancode = ioIn(KEYBOARD_DATA_PORT);
     setTerminalColor(WHITE, BLACK);
     if(!(scancode & 0x80)) {
       if(scancode < 128 && scancode != 0)
@@ -36,7 +37,7 @@ void handleKeyboardInterrupt(){
 }
 
 void addKeyboardInterruptToIdt(){
-  unsigned int offset = (unsigned int)keyboardHandler;
+  uint32_t offset = (uint32_t)keyboardHandler;
   idt[0x21].offsetLower = offset & 0x0000ffff;
   idt[0x21].offsetUpper = (offset & 0xffff0000) >> 16;
   idt[0x21].selector = CODE_SEGMENT_OFFSET;
