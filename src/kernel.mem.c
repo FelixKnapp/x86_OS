@@ -1,4 +1,5 @@
 #include "kernel.mem.h"
+#include "kernel.utils.h"
 #include <stdint.h>
 
 #define SECTOR_SIZE  0x2
@@ -8,10 +9,6 @@
 
 volatile uint8_t* const bitmap = (volatile uint8_t* const)BITMAP_BASE;
 volatile uint8_t* const memory = (volatile uint8_t* const)SECTOR_BASE;
-
-void setBits(volatile uint8_t* ptr, uint8_t bits, uint8_t value);
-uint8_t getBit(uint8_t value, uint8_t bit);
-uint8_t translateTo8Bit(uint8_t value);
 
 void clearMem(){
   for(uint32_t i = 0; i < SECTOR_COUNT / 8; i++) 
@@ -30,7 +27,7 @@ volatile void* memalloc(uint32_t size){
 
   // best fit: searches for smallest gap which fits
   for(; i < SECTOR_COUNT; i++) {
-    if(!(getBit(*(bitmap + i / 8), translateTo8Bit(i%8)))) free_length ++;
+    if(!(getBit(*(bitmap + i / 8), i%8))) free_length ++;
     else {
       if(free_length < min_free_length && free_length >= size) {
         min_free_length = free_length;
@@ -54,7 +51,7 @@ volatile void* memalloc(uint32_t size){
   for(uint32_t i = index; i < index + size; i++)
     *(memory + i * SECTOR_SIZE) = 0x00;
   for(uint32_t i = index; i < index + size; i++)
-    setBits(bitmap + i / 8, translateTo8Bit(i%8), 1);
+    setBit(bitmap + i / 8, i%8, 1);
 
   //return pointer
   return memory + index * SECTOR_SIZE;
@@ -64,36 +61,7 @@ void free(volatile void* ptr, uint32_t size){
   if(!(ptr && size)) return;
   for(uint32_t i = 0; i < size; i++) {
     uint32_t index = ((uint8_t*)ptr - memory) / SECTOR_SIZE;
-    setBits(bitmap + (index + i) / 8, translateTo8Bit((index+i)%8), 0);
+    setBit(bitmap + (index + i) / 8, (index+i)%8, 0);
   }
-}
-
-void setBits(volatile uint8_t* ptr, uint8_t bits, uint8_t value) {
-  *ptr = *ptr & ~bits;
-  if(value) *ptr = *ptr | (0xff & bits);
-}
-uint8_t getBit(uint8_t value, uint8_t bit) {
-  return value & bit;
-}
-uint8_t translateTo8Bit(uint8_t value) {
-  switch (value) {
-    case 0:
-      return 0b00000001;
-    case 1:
-      return 0b00000010;
-    case 2:
-      return 0b00000100;
-    case 3:
-      return 0b00001000;
-    case 4:
-      return 0b00010000;
-    case 5:
-      return 0b00100000;
-    case 6:
-      return 0b01000000;
-    case 7:
-      return 0b10000000;
-  }
-  return 0;
 }
 
