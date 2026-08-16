@@ -3,7 +3,7 @@
 SRC_KERNEL_MODULES := $(wildcard src/kernel.*.c)
 O_KERNEL_MODULES := $(patsubst src/kernel.%.c,temp/kernel.%.o,$(SRC_KERNEL_MODULES))
 
-build: dirs boot $(O_KERNEL_MODULES) link
+build: clean dirs boot $(O_KERNEL_MODULES) link
 
 dirs:
 	@mkdir -p temp build
@@ -21,5 +21,9 @@ link:
 
 run:
 	@qemu-system-x86_64 -hda "build/OS.bin" -m 128M
+
+clean:
+	@rm -rf temp
+	@rm -rf build
 
 all: build run
