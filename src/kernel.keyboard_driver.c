@@ -1,7 +1,8 @@
 #include "kernel.keyboard_driver.h"
 #include "keymap.h"
 #include "kernel.interrupts.h"
-#include "kernel.video.h" // NOTE: TEMPORARY
+#include "kernel.mem.h"
+#include "kernel.utils.h"
 #include <stdint.h>
 
 extern void keyboardHandler();
@@ -16,20 +17,39 @@ extern void ioOut(uint16_t port, uint8_t data);
 #define KEYBOARD_DATA_PORT 0x60
 #define KEYBOARD_STATUS_PORT 0x64
 
+#define KEY_PRESSED_ARRAY_SIZE 32
+
+int8_t* pressed_keys;
+int8_t last_key_pressed;
+
 void initKeyboard() {
   // unmask keyboard Interrypt
   ioOut(PIC1_DATA_PORT, 0b11111101);
+
+  // setup keys
+  pressed_keys = memalloc(KEY_PRESSED_ARRAY_SIZE);
 }
 
 void handleKeyboardInterrupt(){
   uint8_t status = ioIn(KEYBOARD_STATUS_PORT);
 
   if(status & 0x1) {
-    int8_t scancode = ioIn(KEYBOARD_DATA_PORT);
-    setTerminalColor(WHITE, BLACK);
-    if(!(scancode & 0x80)) {
-      if(scancode < 128 && scancode != 0)
-        printChar(kbd_US[scancode]); // NOTE: Temporary, add real driver here (should tell os what key was pressed and what is currently pressed), also no current implementation for special keys like alt, host, arrow keys, etc.
+    uint8_t scancode = ioIn(KEYBOARD_DATA_PORT);
+
+    if(scancode < 0x80){
+      if(!doesArrayContainByte(pressed_keys, KEY_PRESSED_ARRAY_SIZE, kbd_US[scancode])) {
+        appendByteToArray(pressed_keys, KEY_PRESSED_ARRAY_SIZE, kbd_US[scancode]);
+        last_key_pressed = kbd_US[scancode];
+      }
+
+    }else{
+      scancode -= 0x80;
+
+      if(doesArrayContainByte(pressed_keys, KEY_PRESSED_ARRAY_SIZE, kbd_US[scancode]))
+        *(pressed_keys + getIndexOfByteFromArray(pressed_keys, KEY_PRESSED_ARRAY_SIZE, kbd_US[scancode])) = 0;
+    
+      if(kbd_US[scancode] == last_key_pressed) 
+        last_key_pressed = 0;
     }
   }
 

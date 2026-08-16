@@ -40,3 +40,34 @@ uint8_t translateTo8Bit(uint8_t value) {
   return 0;
 }
 
+uint8_t doesArrayContainByte(int8_t* array, uint32_t size, int8_t target) {
+  if(!array || !size) return 0;
+
+  for(uint32_t i = 0; i < size; i ++)
+    if(*(array + i) == target) 
+      return 1;
+  
+  return 0;
+}
+
+uint8_t appendByteToArray(int8_t* array, uint32_t size, int8_t byte) {
+  if(!array || !size || !byte) return 1; 
+
+  for(uint32_t i = 0; i < size; i ++) {
+    if(!*(array + i)) {
+      *(array + i) = byte;
+      return  0;
+    }
+  }
+  return 2;
+}
+
+uint32_t getIndexOfByteFromArray(int8_t* array, uint32_t size, int8_t byte) {
+  if(!array || !size) return 0; 
+
+  for(uint32_t i = 0; i < size; i ++)
+    if(*(array + i) == byte)
+      return  i;
+  return 0;
+}
+
