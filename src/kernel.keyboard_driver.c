@@ -27,7 +27,7 @@ void initKeyboard() {
   ioOut(PIC1_DATA_PORT, 0b11111101);
 
   // setup keys
-  pressed_keys = memalloc(KEY_PRESSED_ARRAY_SIZE);
+  pressed_keys = (int8_t*)memalloc(KEY_PRESSED_ARRAY_SIZE);
 }
 
 void handleKeyboardInterrupt(){
